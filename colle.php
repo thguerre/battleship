@@ -93,8 +93,26 @@ function colle (int $x, int $y, array $coords) : void
 	//var_dump($validCoord(" [ 1 , 2 ] ", $x, $y));
 
 	$printGrid($x, $y, $grid, $tools);
-	while (true) {
-		echo "$> ";
+
+
+	// player stuffs
+	
+	$playerCount = 2;
+	$playerMaxShips = 2;
+	$playerShipCount = array_fill(0, $playerCount, 0);
+
+
+	$currentPlayer = 0;
+	echo "Player 1, place your $playerMaxShips ships :\n";
+
+	$winner = false;
+	$shipsPlaced = false;
+
+	while (!$winner) {
+		if ($shipsPlaced)
+			echo "Player ".($currentPlayer+1).", launch your attack :\n";
+		echo "Player ".($currentPlayer+1)." $> ";
+
 		$userEntry = readline();
 		//echo "you entered $userEntry\n";
 		$argStart = strpos($userEntry, ' ', 0);
@@ -104,13 +122,37 @@ function colle (int $x, int $y, array $coords) : void
 		switch ($command) {
 			// add "help" and "exit" for bonus
 			case "query":
+				if (!$shipsPlaced) {
+					echo "All ships havn't been placed yet !\n";
+					break;
+				}
 				if (!$coords) {
 					$printCoordsInvalid();
 					break;
 				}
-				echo $grid[$coords[0]][$coords[1]] != ' ' ? "full\n" : "empty\n";
+				$cellVal = $grid[$coords[0]][$coords[1]];
+			       	$cellEmpty = $cellVal == ' ';
+				if ($cellEmpty || $cellVal == $currentPlayer || $cellVal == 'X')
+					echo "Player ".($currentPlayer+1).", you didn't touch anything.\n";
+				else {
+					$playerShipCount[$cellVal]--;
+					$grid[$coords[0]][$coords[1]] = 'X';
+					echo "Player ".($currentPlayer+1).", you touched a boat of player ".($cellVal+1)." !\n";
+
+					if ($playerShipCount[$cellVal] == 0) {
+						$winner = $currentPlayer;
+						break 2;
+					}
+					//var_dump($playerShipCount[$cellVal]);
+				}
+				$currentPlayer = $currentPlayer+1 == $playerCount ? 0 : $currentPlayer +1;
+				
 				break;
 			case "add":
+				if ($shipsPlaced) {
+					echo "All ships already have been placed !\n";
+					break;
+				}
 				if (!$coords) {
 					$printCoordsInvalid();
 					break;
@@ -118,8 +160,20 @@ function colle (int $x, int $y, array $coords) : void
 
 				if ($grid[$coords[0]][$coords[1]] != ' ')
 					echo "A cross already exists at this location\n";
-				else
-					$grid[$coords[0]][$coords[1]] = 'X';
+				else {
+					$grid[$coords[0]][$coords[1]] = $currentPlayer;
+					$playerShipCount[$currentPlayer]++;
+					if ($playerShipCount[$currentPlayer] == $playerMaxShips) {
+						$currentPlayer++;
+						if ($currentPlayer == $playerCount){
+							$currentPlayer = 0;
+							$shipsPlaced = true;
+						} else {
+							$tmp = $currentPlayer+1;
+							echo "Player $tmp, place your $playerMaxShips ships :\n";
+						}
+					}
+				}
 				break;
 			case "remove":
 				if (!$coords) {
@@ -140,8 +194,7 @@ function colle (int $x, int $y, array $coords) : void
 				break;
 		}
 	}
-
 	
+	echo "Player ".($winner+1)." win !!\n";
 }
-
 
