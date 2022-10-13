@@ -57,7 +57,6 @@ function colle (int $x, int $y, array $coords) : void
 		$tx = $coord[0];
 		$ty = $coord[1];
 		if ($tx < 0 || $tx > $x || $ty < 0 || $ty > $y){
-			echo "skipped\n";
 			continue;
 		}
 		$updateGrid($grid, $coord[0], $coord[1], 'X');
