@@ -198,3 +198,4 @@ function colle (int $x, int $y, array $coords) : void
 	echo "Player ".($winner+1)." win !!\n";
 }
 
+colle(4, 4, []);
