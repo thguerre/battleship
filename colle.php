@@ -1,7 +1,7 @@
 <?php
 
 
-function colle (int $x, int $y) : void
+function colle (int $x, int $y, array $coords) : void
 {
 	if ($x == 0 || $y == 0)
 		return;
@@ -43,14 +43,26 @@ function colle (int $x, int $y) : void
 	};
 
 	$updateGrid = function(&$grid, $x, $y, $newValue) {
-		//
+		$grid[$x][$y] = $newValue;
 	};
 
-
+	
 	$tools = ["interGrid" => $interGrid, "gridContent" => $gridContent];
 	//$interGrid($x);
 	//$gridContent($x, 3, $grid);
 	//var_dump($grid);
+	//$printGrid($x, $y, $grid, $tools);
+
+	foreach ($coords as $coord) {
+		$tx = $coord[0];
+		$ty = $coord[1];
+		if ($tx < 0 || $tx > $x || $ty < 0 || $ty > $y){
+			echo "skipped\n";
+			continue;
+		}
+		$updateGrid($grid, $coord[0], $coord[1], 'X');
+	}
+
 	$printGrid($x, $y, $grid, $tools);
 	//var_dump($grid);
 
